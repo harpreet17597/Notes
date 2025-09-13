@@ -1,0 +1,310 @@
+
+AWS (Amazon Web Services)
+
+AWS have service called S3
+
+S3 stands for Simple Storage Service 
+
+We can create 100 buckets per account
+
+We can store unlimited data in a buckets
+
+We donot have to do any work using Root user create a IAM user
+
+Create a group and donot attach any pplicy for now
+
+Create IAM user
+
+go to i am user and create new user 
+
+click to give console access
+select create I am user
+select create new password on login
+
+select a group and create a user
+
+copy the url and go to another browser and login through that IAM user
+
+now this user doesnot have any policy attach because we assign a grouop that has no permissions now
+
+so you cannot create a s3bucket for now
+
+
+Now go to usergroup and click on add permissions
+search for AmazonS3FullAccess and add this
+
+
+Now go back to IAM user login console now you see you can view and create a user
+
+
+Now create a new buckets
+
+Note: Bucket name must be unique in entire world because you see that i will create your object url as bucket name so it must be unique
+like we have domain url
+
+
+When u upload object and open it in browser you see AccessDenied Error
+
+so go to bucket permissions and uncheck block public acess and save
+
+If you again open objetc url you still get same issue because object are public available but our bucket
+does not have any policy so we need to create policy for our bucket
+
+
+Go to bucket policy and click create bucket policy
+
+Non in Actions array gave acces for s3 to getobject
+
+Action: [
+  "s3:GetObject"
+]
+
+
+In Resource array
+search for s3 and click add Resource it will open popup then select All Resource in this bucket and then add
+
+it will add like this
+
+"Resource": [
+				"*"
+			]
+
+
+or copy Bucket ARN 
+
+"Resource": [
+		"arn:aws:s3:::happy-17597/*"
+]
+
+
+but you can not do this because of permissions so copy it add through your root user
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "Statement1",
+			"Principal": {},
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject"
+			],
+			"Resource": [
+				"arn:aws:s3:::happy-17597/*"
+			]
+		}
+	]
+}
+
+when you add it gave error Principal can not be empty
+
+so do
+	"Principal": "*",
+
+
+Now go to browser your image is opened now  
+
+
+Object URL
+https://happy-17597.s3.eu-north-1.amazonaws.com/Screenshot+from+2025-09-11+07-34-29.png
+
+Key
+Screenshot from 2025-09-11 07-34-29.png
+
+
+
+You can also use s3 bucket for static hosting go to properties and allow static hosting and gave Index document
+as index.html
+
+create index.html and upload to s3 bucket and copy the object url and you see your index render in browser
+
+
+
+
+---------------------------------------------------------------------------------------------------------------
+
+NOTE: IN AWS EACH THING IS AN API CALL
+
+IN AWS CONSOLE FOR EACH THING THEIR IS AN API CALL
+
+
+When you create private bucket you can upload and download from this bucket publically.
+
+But you say then how i can upload files from aws console beacuse of pre signed URL
+and you can also access only using pre-signed URL
+
+
+When you see pre-signed url carefully there is two things there
+1. Signature
+2. Token
+
+So basically their in expired time in these tokens you can only acces it for allowed time
+
+
+So when you upload file from console aws under the hood create these sigature and token and used that for upload
+
+
+We can create Signature and Token using account that have permissions for s3 bucket
+
+So we can use user access key to generate these Signature and Token so that we can get and upload to s3 bucket
+
+and we provide these in url to get object
+
+
+Example
+https://happy-17597.s3.eu-north-1.amazonaws.com/Screenshot+from+2025-09-11+07-34-29.png
+
+this is private bucket object if you open it it give AccessDenied
+
+so what we do we use user acces key and create
+1. Signature
+2. Token
+
+In these there is user account detail
+
+and use these in query parameter
+https://happy-17597.s3.eu-north-1.amazonaws.com/Screenshot+from+2025-09-11+07-34-29.png?Signature=""&Token=""
+
+
+
+Pre Signed URL of two types
+
+1. GetObject
+2. PutObject
+
+
+AWS S3 Quick Guide
+
+This guide explains how to set up an AWS S3 bucket, configure permissions, and use pre-signed URLs for access.
+
+1. Introduction
+
+AWS (Amazon Web Services) offers a storage service called S3 (Simple Storage Service).
+
+You can create up to 100 buckets per account.
+
+Buckets can store unlimited data.
+
+Important: Always avoid using the Root User for day-to-day tasks. Create an IAM user instead.
+
+2. Creating an IAM User
+
+Go to the IAM console.
+
+Create a group (leave it without any policy for now).
+
+Create a new IAM user:
+
+Enable Console Access.
+
+Set a password for login.
+
+Assign the user to the group created earlier.
+
+Copy the login URL and use another browser to log in as the IAM user.
+
+At this stage, the IAM user has no permissions, so they cannot create an S3 bucket yet.
+
+3. Adding Permissions
+
+Go to the User Group.
+
+Click Add Permissions.
+
+Search for AmazonS3FullAccess and attach it to the group.
+
+Log back in as the IAM user – now you can view and create S3 buckets.
+
+4. Creating a Bucket
+
+Create a new bucket.
+
+Bucket names must be globally unique (like domain names) because the object URL uses the bucket name.
+
+5. Fixing Access Denied Errors
+
+When you upload an object and try to open its URL in a browser, you may get an AccessDenied error.
+
+Steps to Fix:
+
+Go to Bucket Permissions → Block Public Access → Uncheck and Save.
+
+If the error persists, add a Bucket Policy to allow public access.
+
+Example policy:
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Statement1",
+      "Principal": "*",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name/*"
+      ]
+    }
+  ]
+}
+
+
+Replace your-bucket-name with your actual bucket name.
+
+After saving, you should be able to open the object in your browser.
+Example:
+https://happy-17597.s3.eu-north-1.amazonaws.com/Screenshot+from+2025-09-11+07-34-29.png
+
+6. Static Website Hosting
+
+You can host a static website on S3:
+
+Go to Bucket Properties.
+
+Enable Static Website Hosting.
+
+Specify index.html as the index document.
+
+Upload index.html to the bucket.
+
+Use the generated endpoint URL to view your site.
+
+7. Pre-Signed URLs
+
+AWS treats every operation as an API call.
+When working with private buckets, you cannot access objects directly from a browser.
+Instead, AWS generates pre-signed URLs containing:
+
+A Signature
+
+A Token
+
+An Expiration Time
+
+This allows temporary access to upload or download files without making them public.
+
+You can generate pre-signed URLs for:
+
+GetObject (download)
+
+PutObject (upload)
+
+Example (private object):
+
+https://happy-17597.s3.eu-north-1.amazonaws.com/Screenshot+from+2025-09-11+07-34-29.png?Signature=...&Token=...
+
+
+These URLs are created using your IAM user’s Access Key and Secret Key.
+
+8. Key Takeaways
+
+Always use IAM users instead of the root account.
+
+Attach policies to groups and manage users via groups.
+
+Bucket names must be unique.
+
+Public access requires permissions + bucket policy.
+
+For private access, use pre-signed URLs.
